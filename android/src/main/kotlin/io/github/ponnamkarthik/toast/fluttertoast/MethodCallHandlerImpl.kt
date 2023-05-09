@@ -29,7 +29,6 @@ internal class MethodCallHandlerImpl(var context: Context) : MethodCallHandler {
                 val mMessage = call.argument<Any>("msg").toString()
                 val length = call.argument<Any>("length").toString()
                 val gravity = call.argument<Any>("gravity").toString()
-                val bgcolor = call.argument<Number>("bgcolor")
                 val textcolor = call.argument<Number>("textcolor")
                 val textSize = call.argument<Number>("fontSize")
 
@@ -45,43 +44,21 @@ internal class MethodCallHandlerImpl(var context: Context) : MethodCallHandler {
                     Toast.LENGTH_SHORT
                 }
 
-                if (bgcolor != null && Build.VERSION.SDK_INT <= 31) {
-                    val layout = (context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater).inflate(R.layout.toast_custom, null)
-                    val text = layout.findViewById<TextView>(R.id.text)
-                    text.text = mMessage
-
-                    val gradientDrawable: Drawable = if (Build.VERSION.SDK_INT >= 21) {
-                        context.getDrawable(R.drawable.corner)!!
-                    } else {
-                        context.resources.getDrawable(R.drawable.corner)
-                    }
-                    gradientDrawable.setColorFilter(bgcolor.toInt(), PorterDuff.Mode.SRC_IN)
-                    text.background = gradientDrawable
-                    if (textSize != null) {
-                        text.textSize = textSize.toFloat()
-                    }
-                    if (textcolor != null) {
-                        text.setTextColor(textcolor.toInt())
-                    }
-                    mToast = Toast(context)
-                    mToast?.duration = mDuration
-                    mToast?.view = layout
-                } else {
-                    mToast = Toast.makeText(context, mMessage, mDuration)
-                    if (Build.VERSION.SDK_INT <= 31) {
-                        try {
-                            val textView: TextView = mToast?.view!!.findViewById(android.R.id.message)
-                            if (textSize != null) {
-                                textView.textSize = textSize.toFloat()
-                            }
-                            if (textcolor != null) {
-                                textView.setTextColor(textcolor.toInt())
-                            }
-                        } catch (e: Exception) {
-
+                mToast = Toast.makeText(context, mMessage, mDuration)
+                if (Build.VERSION.SDK_INT <= 31) {
+                    try {
+                        val textView: TextView = mToast?.view!!.findViewById(android.R.id.message)
+                        if (textSize != null) {
+                            textView.textSize = textSize.toFloat()
                         }
+                        if (textcolor != null) {
+                            textView.setTextColor(textcolor.toInt())
+                        }
+                    } catch (e: Exception) {
+
                     }
                 }
+
                 if(Build.VERSION.SDK_INT <= 31) {
                     when (mGravity) {
                         Gravity.CENTER -> {
